@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UniFlui · Cecília Paiva</title>
+<meta name="description" content="Estudo de caso: UniFlui, do problema da superlotação em unidades de saúde ao MVP de gestão de UBSs. Selecionado no 13º Campus Mobile, com pesquisa, pivô de produto e artigo.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="./">Cecília Paiva</a>
+  <nav aria-label="Principal"><a href="./#casos">Casos</a><a href="./#contato">Contato</a></nav>
+</div></header>
+
+<main class="wrap">
+<a class="back" href="./">← Todos os casos</a>
+<section class="hero" style="padding-top:24px">
+  <p class="eyebrow">Estudo de caso · Selecionado no 13º Campus Mobile</p>
+  <h1>UniFlui: da fila no hospital à gestão das unidades de saúde</h1>
+  <p class="lead">Uma ideia de aula que virou projeto de disciplina, foi selecionada num programa nacional, ganhou pesquisa com usuários, mudou de direção e hoje é um MVP de plataforma para unidades básicas de saúde. É o meu projeto mais longo, e o que mais me ensinou sobre mudar de rumo com evidência.</p>
+  <dl class="meta">
+    <div><dt>Meu papel</dt><dd>Produto e desenvolvimento, em equipe</dd></div>
+    <div><dt>Equipe</dt><dd>2 pessoas na origem e no MVP; 4 na fase de pesquisa e prototipação</dd></div>
+    <div><dt>Período</dt><dd>2024 até hoje</dd></div>
+    <div><dt>Estado</dt><dd>MVP do backend pronto, com dados fictícios. Publicação em preparação</dd></div>
+  </dl>
+  <div class="cta">
+    <a class="btn" href="https://cecilia-paivas-team.adalo.com/local-services-finder-app" rel="noopener">Ver o protótipo navegável</a>
+  </div>
+</section>
+
+<h2>A linha do tempo</h2>
+<ul class="timeline tl">
+  <li><strong>2024 · A ideia</strong>
+    Nasce numa aula de administração sobre inovação, num grupo de cinco estudantes. Escrevemos o Documento de Visão: um app que mostra ao paciente onde há atendimento e o tamanho da fila.</li>
+  <li><strong>Em seguida · Projeto de disciplina</strong>
+    Duas pessoas do grupo levaram a ideia para a disciplina de Engenharia de Software, e passaram a estudá-la e aprimorá-la.</li>
+  <li><strong>jan–fev/2025 · 13º Campus Mobile</strong>
+    A proposta "Gestão de Filas Inteligentes em Unidades de Saúde" foi selecionada na categoria Saúde do programa nacional do Instituto Claro. Fizemos entrevistas, requisitos, histórias de usuário, modelo de negócio e pitch.</li>
+  <li><strong>2025 · Pesquisa e prototipação</strong>
+    A equipe passou a ter 4 pessoas. Na disciplina de Engenharia de Software Aplicada: entrevistas com usuários, protopersonas, backlog com cenários BDD, protótipo no Figma e protótipo navegável no Adalo. Escrevemos também um artigo sobre o projeto para o SBSI 2025.</li>
+  <li><strong>mai–jun/2026 · Pivô para um MVP de gestão</strong>
+    O produto deixa de ser só um app de informação para o paciente e vira uma plataforma de saúde pública, com agendamento, métricas, escala de profissionais e IA para os gestores das UBSs.</li>
+</ul>
+
+<h2>O problema</h2>
+<p>A superlotação em unidades de saúde afeta quem espera e quem trabalha. Para o paciente, fila longa, risco de desistir do atendimento e de recorrer à automedicação, que pode piorar quadros simples. Para o profissional, ambientes lotados significam desgaste físico e mental e risco de burnout, o que reduz a qualidade do acolhimento.</p>
+<p>Uma das causas que escolhi atacar é a <strong>desinformação</strong>: muita gente não sabe qual unidade atende a sua queixa e acaba indo ao lugar errado, o que gera aglomeração desnecessária. Na literatura que consultamos, a fila é descrita como a porta de entrada do sistema de saúde e molda a visão do usuário sobre ele.</p>
+
+<h2>Descoberta: o que as entrevistas mostraram</h2>
+<p>Entrevistamos <strong>8 pessoas</strong>, uma a uma, com roteiro estruturado e gravação em áudio com consentimento. Transcrevemos e analisamos as respostas com apoio de uma ferramenta de IA e organizamos os dados em gráficos para enxergar padrões. Também ouvimos profissionais de saúde: <strong>6 de 8 enfrentam superlotação diariamente ou semanalmente</strong>, principalmente em atendimento especializado, pronto-socorro, recepção e ambulatórios.</p>
+<div class="tablewrap"><table>
+  <thead><tr><th>O que encontramos</th><th>O que isso mudou</th></tr></thead>
+  <tbody>
+    <tr><td>Todos queriam saber o quão ocupados os hospitais da região estão, e a maioria preferia um lugar com pouca fila a um mais próximo.</td><td>A informação de fila virou o centro da proposta de valor, acima da localização.</td></tr>
+    <tr><td>A maioria tinha dificuldade em achar especialistas e em saber onde e quando atendem, o que levava a adiar a busca e a desistir.</td><td>Busca por especialidade entrou como requisito.</td></tr>
+    <tr><td><strong>O perfil real não era o que tínhamos planejado.</strong> Esperávamos pessoas do interior de 20 a 45 anos. Os entrevistados eram majoritariamente urbanos, mais velhos (até 60) e com escolaridade alta.</td><td>Em vez de forçar o perfil original, separamos duas protopersonas por faixa etária e passamos a considerar públicos urbano e rural.</td></tr>
+  </tbody>
+</table></div>
+<p>O terceiro ponto é o mais importante. A amostra era pequena e diferente da esperada, e em vez de esconder isso o relatório compara o perfil proposto com o real e diz o que a diferença significa.</p>
+
+<h2>Primeira solução e modelo de negócio</h2>
+<ul>
+  <li><strong>Para o paciente (grátis):</strong> mapa com as unidades próximas, filtros por especialidade, horários, rota e tamanho da fila.</li>
+  <li><strong>Para a unidade (assinatura):</strong> relatórios de fluxo por setor e destaque no aplicativo. O modelo é <em>B2C2B</em>: o paciente atrai, a unidade paga.</li>
+  <li><strong>Sem depender de contrato:</strong> para a rede pública, a ideia era usar bases abertas de unidades (CNES e DataSUS). Com contrato, a rede privada ganharia a fila em tempo real e os relatórios.</li>
+  <li>Mapeamos a concorrência (sistemas de senha e gerenciadores de fila) e vimos que ofereciam painéis e totens, mas não ajudavam o paciente a <em>escolher</em> onde ir.</li>
+  <li>Na primeira versão, o tamanho da fila viria de uma câmera com reconhecimento de imagem na sala de espera.</li>
+</ul>
+<p>Depois, o fluxo evoluiu: o paciente escaneia um <strong>QR code na recepção</strong>, preenche um pré-prontuário, entra na fila da unidade e sai dela ao ser atendido. A recepcionista vê os dados e o tempo médio de espera.</p>
+
+<h2>Requisitos e backlog</h2>
+<p>Escrevemos <strong>17 requisitos funcionais e 4 não funcionais</strong>, entre eles LGPD e acessibilidade, e um backlog priorizado em três ondas: primeiro o núcleo (mapa, unidades próximas, fila), depois o que dá confiança (cadastro, rota, horários) e por último o conforto (favoritos).</p>
+<p>Cada funcionalidade tem história de usuário e cenários BDD, <strong>incluindo os de falha</strong>: se o logout falha por erro de rede, o usuário continua logado e é avisado; se a exclusão da conta falha, a conta não é apagada. Pensar no erro é parte da especificação.</p>
+<p>Validamos com um protótipo navegável no Adalo e com telas no Figma, antes de qualquer código.</p>
+
+<h2>O pivô</h2>
+<p>O MVP de 2026 muda o ponto de partida. Em vez de mostrar a fila em tempo real captada por câmera, a plataforma <strong>organiza a demanda na origem</strong>, e serve a quem gerencia a unidade:</p>
+<div class="tablewrap"><table>
+  <thead><tr><th></th><th>Primeira versão</th><th>MVP de 2026</th></tr></thead>
+  <tbody>
+    <tr><td>Foco</td><td>Informar o paciente</td><td>Gerir a unidade e a rede</td></tr>
+    <tr><td>Fila</td><td>Contada por câmera</td><td>Agendamento, lembretes e fila de atendimento</td></tr>
+    <tr><td>Para o gestor</td><td>Relatório de fluxo</td><td>Métricas, escala de profissionais otimizada e dashboard com IA</td></tr>
+    <tr><td>Perfis</td><td>Paciente e administrador</td><td>Paciente, profissional, gestor da UBS e secretaria de saúde</td></tr>
+    <tr><td>Produto</td><td>Aplicativo de informação</td><td>Plataforma white label de saúde pública</td></tr>
+  </tbody>
+</table></div>
+
+<h2>O MVP de 2026</h2>
+<p>Defini quatro módulos: <strong>agendamento, registro pós-consulta, notificações e métricas</strong>. UBSs, especialidades e horários entram como dados fictícios, preparados para importar de fontes oficiais (CNES). Preferi não esperar uma integração para validar o fluxo.</p>
+<h3>Regras de produto que protegem as pessoas</h3>
+<ul>
+  <li><strong>Cancelar com pelo menos 24 horas de antecedência</strong>, e o horário volta a ficar livre para outro paciente. Quando é o profissional que cancela, a justificativa é obrigatória e o paciente é notificado.</li>
+  <li><strong>Registro pós-consulta imutável</strong>, só criado se a consulta foi realizada.</li>
+  <li><strong>Métricas nunca expõem dados que identifiquem um paciente.</strong> O gestor só vê a própria unidade (relação 1 para 1), e a secretaria vê o agregado.</li>
+  <li><strong>O isolamento entre unidades vem do token de login</strong> e nunca de um dado enviado pela tela.</li>
+  <li><strong>Login com identificador diferente por perfil:</strong> paciente entra com CPF e profissional com matrícula, e o sistema recusa o identificador trocado com uma mensagem que explica o motivo.</li>
+</ul>
+<h3>Escala de profissionais por otimização matemática</h3>
+<p>Em vez de o gestor montar a escala na mão, o sistema calcula uma escala que <strong>cobre o mínimo de médicos e enfermeiros em cada turno sem passar da carga contratada</strong> de cada profissional (programação linear inteira). Começou semanal e, na sprint 11, virou mensal. Ao final, a IA escreve um resumo em português para o gestor.</p>
+<h3>Dashboard que explica os números</h3>
+<p>Os indicadores (absenteísmo, ocupação, demanda por especialidade) ganharam uma narrativa gerada por IA, com recomendações como "considere enviar lembretes 48 horas antes". A regra de segurança do projeto é que <strong>a IA nunca escreve nem executa SQL</strong>: ela deve só acionar funções que já existem no sistema, com parâmetros controlados. As respostas ficam em cache, e se o cache cair o sistema continua funcionando.</p>
+<p>O provedor de IA mudou no meio do caminho, do Gemini para a Groq, por bloqueios de cota e autenticação. A troca exigiu mexer na dependência, na configuração e no formato da resposta, e foi o motivo de uma sprint de estabilização.</p>
+
+<h2>Hipóteses e o que já sei sobre elas</h2>
+<div class="tablewrap"><table>
+  <thead><tr><th>Hipótese</th><th>Como testei ou testaria</th><th>Situação</th></tr></thead>
+  <tbody>
+    <tr><td>O paciente prefere um lugar com pouca fila a um mais próximo.</td><td>Entrevistas com 8 pessoas.</td><td><strong>Indício.</strong> Amostra pequena e mais urbana do que o previsto.</td></tr>
+    <tr><td>Saber a ocupação e a especialidade antes de sair de casa reduz deslocamentos desnecessários.</td><td>Protótipo navegável e artigo. Falta medir com uma unidade real.</td><td><strong>Aberta.</strong></td></tr>
+    <tr><td>Lembrete 24 horas antes e cancelamento fácil reduzem o absenteísmo.</td><td>Lembretes automáticos, cancelamento que libera o horário e a taxa de absenteísmo como indicador.</td><td><strong>Aberta.</strong> Funcionando com dados fictícios.</td></tr>
+    <tr><td>O gestor age mais com uma explicação em linguagem natural do que com o número bruto.</td><td>Dashboard com narrativa e recomendações geradas por IA.</td><td><strong>Aberta.</strong> Não testada com gestores.</td></tr>
+    <tr><td>Uma escala otimizada poupa o tempo do gestor e cobre os turnos.</td><td>Módulo de escala mensal com restrições de cobertura e carga.</td><td><strong>Aberta.</strong> Falta comparar com a escala manual de uma UBS real.</td></tr>
+  </tbody>
+</table></div>
+
+<h2>Métricas</h2>
+<ul>
+  <li><strong>Principal (definida):</strong> taxa de absenteísmo, ou seja, ausentes sobre agendados.</li>
+  <li><strong>De apoio (definidas):</strong> taxa de ocupação dos horários, demanda por especialidade e atendimentos realizados por dia, semana e mês.</li>
+  <li><strong>Resultados:</strong> o MVP roda com dados fictícios, então <strong>não há resultado de uso para mostrar</strong>. O que existe de evidência são as entrevistas (8 pessoas e profissionais de saúde), que sustentam o problema, e não a solução.</li>
+</ul>
+
+<h2>Artigo</h2>
+<p>Escrevemos o artigo <em>"O Protagonismo dos Pacientes na Jornada de Atendimento em Unidades de Saúde"</em>, para o Simpósio Brasileiro de Sistemas de Informação (SBSI 2025). Ele reúne o problema, as entrevistas, o fluxo com QR code e a ligação com a estratégia de saúde digital do Brasil.</p>
+
+<h2>O que aprendi</h2>
+<ul>
+  <li>Uma ideia premiada ainda não é um produto. Transformá-la em requisitos, regras e sprints mostrou o que a apresentação não precisava responder.</li>
+  <li>Pesquisa com usuários vale mais quando você compara o que esperava com o que encontrou. O público real era diferente do planejado, e isso mudou as personas.</li>
+  <li>Mudar de direção é parte do produto. O que permaneceu do início ao fim foi o problema (a desinformação e a lotação), não a solução.</li>
+  <li>Regras de privacidade e de acesso entram no desenho desde o primeiro requisito, e não como ajuste final.</li>
+  <li>Sem unidade real, as hipóteses de impacto seguem abertas. A maior prioridade seria validar com uma UBS.</li>
+</ul>
+<p class="note">O código do MVP está em repositório privado.</p>
+</main>
+
+<footer><div class="wrap">© 2026 Maria Cecília Paiva de Sousa. <a href="./">Voltar ao início</a>.</div></footer>
+</body>
+</html>

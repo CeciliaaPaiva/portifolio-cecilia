@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Easy Process · Cecília Paiva</title>
+<meta name="description" content="Estudo de caso: plataforma que transforma entrevistas em áudio em diagramas BPMN com IA. Investigação com casos reais, escolha de modelo com restrição de custo e confiabilidade.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="./">Cecília Paiva</a>
+  <nav aria-label="Principal"><a href="./#casos">Casos</a><a href="./#contato">Contato</a></nav>
+</div></header>
+
+<main class="wrap">
+<a class="back" href="./">← Todos os casos</a>
+<section class="hero" style="padding-top:24px">
+  <p class="eyebrow">Estudo de caso</p>
+  <h1>Easy Process: da entrevista em áudio ao diagrama BPMN</h1>
+  <p class="lead">Ferramenta para analistas de negócio. Você sobe a gravação de uma entrevista com quem executa um processo, a IA transcreve, entende e desenha o diagrama BPMN, e você ajusta conversando em português, sem precisar saber BPMN.</p>
+  <dl class="meta">
+    <div><dt>Meu papel</dt><dd>Product owner e desenvolvedora</dd></div>
+    <div><dt>Período</dt><dd>desde jun/2026</dd></div>
+    <div><dt>Estado</dt><dd>No ar para demonstração</dd></div>
+    <div><dt>Stack</dt><dd>FastAPI, Next.js, PostgreSQL, Groq</dd></div>
+  </dl>
+  <div class="cta">
+    <a class="btn" href="https://easyprocess.ceciliap.com" rel="noopener">Abrir a demo</a>
+    <a class="btn ghost" href="https://github.com/CeciliaaPaiva/easy-process" rel="noopener">Ver o código</a>
+  </div>
+</section>
+
+<figure>
+  <img src="img/app.png" alt="Tela do processo com o diagrama BPMN gerado e a documentação do processo ao lado" loading="lazy">
+  <figcaption>Diagrama gerado, com documentação do processo, chat de refinamento, sugestões de melhoria e transcrição. Dados de demonstração.</figcaption>
+</figure>
+
+<h2>O problema</h2>
+<p>A modelagem do processo atual (<em>as-is</em>) é uma das fases mais lentas de projetos de melhoria. O analista entrevista as pessoas, transcreve, interpreta e só então desenha o fluxo à mão. Trabalho como analista de negócio, mapeando processos em BPMN, e conheço esse gargalo por dentro.</p>
+<p>A proposta é automatizar da gravação até o primeiro diagrama e deixar para o analista a parte que exige julgamento: <strong>revisar e refinar</strong>. A IA não substitui o analista, produz um rascunho que ele corrige.</p>
+
+<h2>O fluxo do usuário</h2>
+<ol>
+  <li>Sobe ou grava o áudio no navegador (até 25 MB).</li>
+  <li>Acompanha o estado do processo: transcrevendo, gerando, pronto. Se der erro, a mensagem real aparece na tela.</li>
+  <li>Revisa o diagrama e pede ajustes no chat ("adicione uma aprovação do gerente antes do pagamento").</li>
+  <li>Volta a qualquer versão anterior, se o ajuste não ficou bom.</li>
+  <li>Exporta o <code>.bpmn</code>, que abre no Camunda Modeler, ou usa a documentação e as sugestões de gargalo geradas.</li>
+</ol>
+<p>Também há modo de apresentação, com a animação de fichas percorrendo o fluxo, para mostrar o processo a quem foi entrevistado.</p>
+
+<h2>A decisão central: investigar antes de mexer no prompt</h2>
+<p>Uma usuária relatou que a IA "nunca cria pools de caixa-preta para atores externos". Em vez de reescrever o prompt no escuro, reaproveitei <strong>seis transcrições reais</strong> de processos diferentes (e-commerce, delivery, manufatura, marketing) geradas por quem testou a plataforma, rodei de novo sem mudar nenhum código e catalogei o resultado.</p>
+<div class="tablewrap"><table>
+  <thead><tr><th>Achado</th><th>O que mostrou</th></tr></thead>
+  <tbody>
+    <tr><td>Tipos de atividade</td><td>Funcionando bem nos 6 casos. Não era o gargalo, ao contrário do que o relato sugeria.</td></tr>
+    <tr><td>Pools e raias</td><td>Só 1 de 6 usou raias, e nenhum modelou um ator externo como pool. A lista de atores estava <em>correta</em> e o XML ignorava essa informação.</td></tr>
+    <tr><td>Gateways</td><td>Os dois casos sem gateway estavam certos (fluxos lineares). Um erro de nuance apareceu no gateway de divisão de um caso.</td></tr>
+  </tbody>
+</table></div>
+<p>O diagnóstico apontou que o modelo já <em>sabia</em> quem eram os atores, e o problema estava na tradução para XML. Daí veio a decisão: <strong>separar a análise semântica da modelagem</strong>. Um prompt único fazia tudo e errava padrões de gateway, e dois estágios errados em separado são mais fáceis de depurar do que um prompt gigante. O layout do diagrama passou a ser calculado em Python, e não pela IA.</p>
+
+<h3>Resultado, e o que custou</h3>
+<p>Rodei de novo o caso que tinha falhado ("pedido pelo app") com a IA real. O diagrama passou de <strong>0 para 4 participantes</strong> (3 pools externos e uma raia interna), e os cinco gateways saíram corretos na primeira tentativa depois de um ajuste de prompt. Também acrescentei uma validação estrutural: se um ator externo não virar pool, o diagrama é reprovado e a IA tenta de novo.</p>
+<div class="callout"><p><strong>O preço da melhoria:</strong> duas chamadas de IA no lugar de uma elevaram o custo por processo de cerca de US$ 0,0009 para US$ 0,0036, quase quatro vezes. Eram centavos, então aceitei e deixei registrado como decisão consciente. O resultado vem de um caso reexecutado, e não de uma amostra grande.</p></div>
+
+<h2>Escolha de modelo com restrição de custo</h2>
+<p>Os créditos do provedor inicial acabaram em setembro e a exigência passou a ser <strong>custo zero</strong>. Comparei modelos no plano gratuito do novo provedor, com a mesma tarefa: o modelo menor falhou 3 de 3 gerações de BPMN, e o maior acertou 4 de 4, também de graça. Ficou o maior.</p>
+<p>Para não depender de um provedor, a aplicação usa um cliente único compatível com a API da OpenAI e um modelo configurável por etapa. Trocar de provedor é mudar variáveis de ambiente.</p>
+
+<h2>Confiabilidade de uma saída que vem de IA</h2>
+<ul>
+  <li>Toda resposta da IA é JSON validado por schema, e o XML é validado antes de ser salvo.</li>
+  <li>Se vier inválido, nova tentativa com o erro no prompt, até 3 vezes. Erros comuns de modelos menores (namespace ausente, símbolo sem escapar) são corrigidos de forma determinística.</li>
+  <li>Cada chamada registra tokens e custo estimado, visíveis num painel de "Uso de IA" restrito ao administrador da plataforma.</li>
+  <li>Limite de uso por IP (cadastro e login) e por empresa (upload e chat), contra abuso.</li>
+</ul>
+
+<figure>
+  <img src="img/diagrama.png" alt="Diagrama BPMN de compras com seis raias, gateways de aprovação e alçada e caminho paralelo" loading="lazy">
+  <figcaption>Exemplo: entrevista sobre o processo de compras gerou seis raias, gateways de aprovação e alçada e um caminho paralelo.</figcaption>
+</figure>
+
+<details>
+  <summary><strong>Detalhes técnicos: multi-empresa e segurança</strong></summary>
+  <p>Cada empresa vê só os próprios dados. O isolamento tem uma suíte de testes própria, que confere que uma empresa nunca enxerga os dados de outra. A aplicação não sobe sem um segredo de autenticação forte, e o upload valida o conteúdo real do arquivo, não só a extensão. Mais de 200 testes automatizados rodam a cada alteração, com a IA sempre simulada para não gastar cota.</p>
+</details>
+
+<h2>Hipóteses e o que já sei sobre elas</h2>
+<div class="tablewrap"><table>
+  <thead><tr><th>Hipótese</th><th>Como testei</th><th>Situação</th></tr></thead>
+  <tbody>
+    <tr><td>Separar a análise da modelagem resolve a ausência de pools para atores externos.</td><td>Seis casos reais como linha de base e reexecução do caso que falhou.</td><td><strong>Validada em 1 caso.</strong> Falta uma amostra maior.</td></tr>
+    <tr><td>O analista aceita um rascunho gerado por IA e o refina, em vez de redesenhar do zero.</td><td>Uso do chat de refinamento por usuárias que testaram a plataforma.</td><td><strong>Indício qualitativo.</strong> Não medi a taxa de aceitação.</td></tr>
+    <tr><td>A ferramenta reduz o tempo de levantamento e modelagem.</td><td>Comparar o tempo até o primeiro diagrama revisado com o desenho manual.</td><td><strong>Aberta.</strong> Ainda sem medição.</td></tr>
+  </tbody>
+</table></div>
+
+<h2>Limites que eu documentei</h2>
+<ul>
+  <li>Transcrições muito longas (acima de uns 40 minutos) podem passar do limite do plano gratuito.</li>
+  <li>A edição manual do diagrama é a próxima etapa do roteiro.</li>
+  <li><strong>Ainda não medi</strong> quanto tempo a ferramenta economiza em relação ao desenho manual nem a taxa de diagramas aceitos sem ajuste. É a métrica que eu definiria como principal e o próximo passo para provar valor.</li>
+</ul>
+
+<h2>O que aprendi</h2>
+<ul>
+  <li>Um relato de usuária é um sintoma. Reproduzir com casos reais antes de agir mostrou que a causa estava em outro lugar.</li>
+  <li>Restrição de custo é critério de produto: ela decide o modelo, o provedor e o que se mede.</li>
+  <li>Em produto com IA, o desenho de produto está em como tratar o erro: validar, tentar de novo e mostrar o motivo ao usuário.</li>
+</ul>
+</main>
+
+<footer><div class="wrap">© 2026 Maria Cecília Paiva de Sousa. <a href="./">Voltar ao início</a>.</div></footer>
+</body>
+</html>

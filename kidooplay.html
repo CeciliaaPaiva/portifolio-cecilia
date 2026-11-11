@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KidooPlay · Cecília Paiva</title>
+<meta name="description" content="Estudo de caso: app de gestão de aluguel por tempo de brinquedos infantis em quiosques. Teste de campo que falhou, preço, planos e priorização.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="./">Cecília Paiva</a>
+  <nav aria-label="Principal"><a href="./#casos">Casos</a><a href="./#contato">Contato</a></nav>
+</div></header>
+
+<main class="wrap">
+<a class="back" href="./">← Todos os casos</a>
+<section class="hero" style="padding-top:24px">
+  <p class="eyebrow">Estudo de caso</p>
+  <h1>KidooPlay: tirar o caderno de papel do quiosque</h1>
+  <p class="lead">Quiosques de shopping e praça alugam patinetes, carrinhos e motos infantis por tempo. Quem opera anota sessão, pagamento e fila num caderno, e o prejuízo aparece no fim do dia. O KidooPlay é o app que registra cada sessão cronometrada, a frota e o caixa no mesmo lugar.</p>
+  <dl class="meta">
+    <div><dt>Meu papel</dt><dd>Product owner e desenvolvedora</dd></div>
+    <div><dt>Período</dt><dd>desde ago/2026</dd></div>
+    <div><dt>Estado</dt><dd>Em validação com operadoras reais; lançamento é a próxima fase</dd></div>
+    <div><dt>Stack</dt><dd>Expo (React Native), Supabase, Cloudflare</dd></div>
+  </dl>
+</section>
+
+<div class="shots" role="group" aria-label="Telas do app com dados fictícios">
+  <figure><img src="img/01-painel.png" alt="Painel do app mostrando brinquedos livres e o botão Nova sessão" loading="lazy"><figcaption>Painel</figcaption></figure>
+  <figure><img src="img/02-nova-sessao.png" alt="Tela de nova sessão" loading="lazy"><figcaption>Nova sessão</figcaption></figure>
+  <figure><img src="img/04-sessao-pronta.png" alt="Sessão pronta para iniciar" loading="lazy"><figcaption>Sessão pronta</figcaption></figure>
+  <figure><img src="img/08-caixa.png" alt="Caixa parcial do dia com Pix, dinheiro e cartão" loading="lazy"><figcaption>Caixa do dia</figcaption></figure>
+</div>
+<p class="note">Telas com dados fictícios.</p>
+
+<h2>O problema</h2>
+<p>O ciclo da operação é <strong>pedir, pagar, liberar, contar e recolher</strong>. No caderno, o registro vem depois da criança já estar no brinquedo, e às vezes nem vem. Quem fica na mesa não vê o que saiu, o tempo excedente não é cobrado e o dono só descobre a perda ao conferir o caixa.</p>
+<p>Defini o critério de sucesso do produto como <strong>uma operadora passar um dia inteiro sem caderno e fechar o caixa pelo app</strong>. Tudo que não ajuda uma sessão cronometrada a ser criada, acompanhada, encerrada e relatada não é núcleo.</p>
+
+<h2>Para quem</h2>
+<ul>
+  <li><strong>Operadora/dona do quiosque:</strong> na mesa, com fila na frente e barulho. Fecha o caixa no fim do dia.</li>
+  <li><strong>Equipe de praça:</strong> em pé, sob sol, com dois segundos de atenção. Consulta o mesmo app com outro papel.</li>
+  <li><strong>Responsável pela criança:</strong> paga e responde pelo uso. Nunca chamado de "cliente" no produto, porque o termo se confunde com quem compra o app.</li>
+</ul>
+
+<h2>O que aconteceu no primeiro teste de campo</h2>
+<p>O primeiro teste numa operação real (fim de agosto de 2026) falhou. Antes de mexer em tela, fiz um diagnóstico para separar o que era produto do que era infraestrutura. A conclusão foi que <strong>o código estava bem e a infraestrutura não existia</strong>:</p>
+<ul>
+  <li>O que estava no ar era a pasta de build da minha máquina de desenvolvimento, exposta por um túnel. Se a máquina dormisse, o app caía.</li>
+  <li>O build publicado tinha seis dias e faltavam as funções mais recentes.</li>
+  <li>Oito migrações do banco de produção nunca tinham sido aplicadas, e isso quebrava o Pix inteiro.</li>
+  <li>Só a criação de sessão funcionava sem internet. Cadastrar brinquedo, fechar caixa e entrar na fila morriam sem rede, e na praça o sinal 4G falha.</li>
+</ul>
+<p>O que fiz em seguida: um ambiente de homologação e outro de produção com bancos separados, deploy automático com testes como portão, backup noturno criptografado e restauração testada. Pouco depois descobri outro erro, que também ficou registrado: a homologação tinha servido o banco de produção por quatro dias, por falta de um build separado. Corrigi com um script de build por ambiente.</p>
+<div class="callout"><p><strong>Aprendizado:</strong> um teste de campo que falha não prova que a ideia está errada. Primeiro descubra qual camada falhou. Aqui, consertar a infraestrutura valia mais do que qualquer funcionalidade nova.</p></div>
+
+<h2>O que a observação em campo mudou</h2>
+<p>Numa visita à operação (18/09) vi que não existia processo: a criança pega o brinquedo primeiro e o registro vem depois, chegam a sair três brinquedos ao mesmo tempo e quem atende na mesa também atende a praça. Desse registro saíram três princípios, que viraram critério de aceite:</p>
+<ol>
+  <li><strong>Iniciar uma sessão tem que ser mais rápido que anotar no caderno.</strong> Se não for, o caderno volta.</li>
+  <li><strong>O app nunca trava o que já está acontecendo.</strong> Ele registra o que aconteceu e, com isso, passa a ser o processo que o negócio não tem.</li>
+  <li><strong>Serve o negócio desorganizado e o organizado, com um fluxo só.</strong> Sem "modo" para cada um.</li>
+</ol>
+<p>Uma decisão fechada antes mudou por causa disso: o nome da criança era obrigatório e passou a ser opcional, com um código gerado no lugar. Já o pagamento pendente continua exigindo identificar o responsável, porque a dívida precisa de alguém por trás.</p>
+
+<h2>Lentidão: medir antes de consertar</h2>
+<p>Duas operadoras relataram lentidão. Em vez de otimizar às cegas, montei um roteiro de medição (rede e CPU limitadas, simulando celular simples e sinal ruim da praça) e defini uma meta antes de mexer no código.</p>
+<div class="tablewrap"><table>
+  <thead><tr><th>Medida (criar uma sessão, 3G ruim)</th><th>Antes</th><th>Meta</th></tr></thead>
+  <tbody>
+    <tr><td>Espera total para criar uma sessão</td><td>11,4 s</td><td>até 4 s</td></tr>
+    <tr><td>Requisições ao servidor no roteiro</td><td>72</td><td>uma por atualização do ponto</td></tr>
+    <tr><td>Passos acima de 1 s</td><td>5 de 8</td><td>cada passo até 1 s, média até 0,5 s</td></tr>
+    <tr><td>Rede "pendurada" (Wi-Fi sem internet)</td><td>84,5 s</td><td>não esperar o servidor</td></tr>
+  </tbody>
+</table></div>
+<p>A etapa foi entregue em produção em outubro. O documento de medição guarda o "antes" e a meta; a comparação com o "depois" ainda vou publicar quando refizer a medição, e prefiro não escrever um número que não medi.</p>
+
+<h2>Preço: a conta que descartou o desconto</h2>
+<p>A pergunta da primeira venda é "quanto custa". Pesquisei a concorrência (dois concorrentes de nicho, em torno de R$ 50 por mês, nenhum com várias unidades) e o preço da sessão no Nordeste (R$ 25 a R$ 35 por 15 minutos).</p>
+<p>Com premissas conservadoras (5 unidades, 25 sessões por dia, R$ 30 por sessão, 26 dias), o faturamento do cliente passa de R$ 19 mil por mês, e a mensalidade de R$ 50 representa cerca de <strong>0,26%</strong> disso. Concluí que <strong>preço não era a barreira, e sim credibilidade</strong>. Baixar o preço convidaria uma guerra que uma empresa com poucos clientes não aguenta, e preço de tabela baixo é difícil de reverter, enquanto encerrar uma promoção não custa nada.</p>
+<p class="note">Essas premissas são estimativas marcadas "a confirmar em campo" no documento original.</p>
+<p>A restrição real era capital. O custo em dinheiro era de cerca de R$ 123 por mês, então a distribuição foi desenhada em degraus: PWA e APK direto no primeiro, Google Play quando houver dois ou três clientes pagando, App Store só quando um cliente iOS pagar a taxa anual.</p>
+
+<h2>Dois clientes, dois produtos, um código</h2>
+<p>Conversei com duas operações bem diferentes. Uma opera a frota e quer rapidez no celular. A outra tem várias unidades, paga hoje um sistema de terceiros e pede acesso pela web, caixa consolidado e termo de compromisso. Nenhuma das duas era o plano que eu tinha desenhado, e isso reorganizou o produto em três planos:</p>
+<div class="tablewrap"><table>
+  <thead><tr><th>Plano</th><th>Para quem</th><th>Preço</th></tr></thead>
+  <tbody>
+    <tr><td>Início</td><td>Quem está começando</td><td>Grátis, com teto de 150 sessões</td></tr>
+    <tr><td>Profissional</td><td>Quem opera a frota pelo celular</td><td>R$ 49 por mês</td></tr>
+    <tr><td>Empresarial</td><td>Redes e franquias com várias unidades</td><td>R$ 149 por mês com 2 pontos</td></tr>
+  </tbody>
+</table></div>
+<p>O Empresarial é onde está o esforço, porque redes e franquias crescem a partir dele. Os planos moram no banco, e não em um segundo projeto: um único código serve ao app Android e à web instalável.</p>
+
+<h2>Roteiro de produto e o que ficou de fora</h2>
+<p>O roteiro tem nove etapas, ordenadas por impacto e esforço e reordenadas em 05/11 depois da validação manual. Regras que impus a mim mesma:</p>
+<ul>
+  <li><strong>Uma etapa por vez, e só a etapa atual ganha spec.</strong> Nada de esboçar especificações das etapas seguintes.</li>
+  <li><strong>Cortar de propósito:</strong> o redesenho do financeiro ficou "na gaveta" até o lançamento, e o rastreio de brinquedo por GPS foi declarado fora de escopo, porque a responsabilidade pode ser registrada sem hardware.</li>
+  <li><strong>Vocabulário fechado, vindo do campo:</strong> "sessão" e nunca "volta"; "A recolher"; "Receber tudo". O termo que a operação usa vence o do documento.</li>
+  <li><strong>O relógio nunca encerra sozinho.</strong> Só uma pessoa confirma que o brinquedo voltou.</li>
+</ul>
+
+<figure>
+  <img src="img/matriz-priorizacao.png" alt="Três matrizes de impacto e esforço: a geral e uma para cada plano, Empresarial e Profissional, com as iniciativas distribuídas em ganhos rápidos, projetos principais, tarefas menores e descartes" loading="lazy">
+  <figcaption>A matriz que usei para ordenar o roteiro. "Resolver lentidão" e "iniciar sessão por código" caíram em ganhos rápidos para os dois planos; o controle de funcionários por unidade e o módulo de playground foram para descartes.</figcaption>
+</figure>
+
+<h2>Hipóteses e o que já sei sobre elas</h2>
+<div class="tablewrap"><table>
+  <thead><tr><th>Hipótese</th><th>Como estou testando</th><th>Situação</th></tr></thead>
+  <tbody>
+    <tr><td>Se iniciar uma sessão for mais rápido que anotar no caderno, a operadora abandona o caderno.</td><td>Sessão rápida por código (próxima etapa), comparando o tempo de criar a sessão com o do caderno.</td><td><strong>Aberta.</strong> Ainda não implementada.</td></tr>
+    <tr><td>Preço não é a barreira; credibilidade é.</td><td>Conta de valor (0,26% do faturamento) e pesquisa de concorrência. Falta uma venda aberta pelo checkout (etapa 6).</td><td><strong>Parcial.</strong> Raciocínio feito, sem teste de venda.</td></tr>
+    <tr><td>Existem dois compradores distintos: quem opera a frota e a rede com várias unidades.</td><td>Conversas com uma operação de cada perfil.</td><td><strong>Indício.</strong> Só duas conversas, então não generalizo.</td></tr>
+    <tr><td>O excedente cobrado paga a assinatura e sustenta a retenção.</td><td>O excedente já é calculado e agora pode ser cobrado, perdoado ou visto como "não faturado".</td><td><strong>Aberta.</strong> Implementado, ainda não medido.</td></tr>
+  </tbody>
+</table></div>
+
+<h2>Métricas</h2>
+<ul>
+  <li><strong>Métrica principal (definida):</strong> uma operadora passa um dia inteiro sem caderno e fecha o caixa pelo app.</li>
+  <li><strong>Métrica de apoio (definida e medida só no "antes"):</strong> tempo para criar uma sessão em rede ruim. Era de 11,4 s e a meta é 4 s.</li>
+  <li><strong>O que ainda não tenho:</strong> números de uso (sessões por dia, retenção por operação). O app já registra eventos de uso, mas ainda não analisei esses dados para publicar, e por isso este caso não traz nenhum.</li>
+</ul>
+
+<h2>Como entrego</h2>
+<p>Mais de 50 specs de implementação com casos de uso numerados, 15 sprints registradas num painel de estado e regras de negócio em TypeScript puro, testadas sem depender de banco. O isolamento entre empresas é feito no banco (RLS), e não em filtro de tela. Cada entrega passa por revisão de segurança e por QA em homologação contra os critérios de aceite antes de eu validar à mão.</p>
+
+<h2>O que aprendi</h2>
+<ul>
+  <li>Teste de campo que falha precisa de diagnóstico por camada antes de virar roadmap.</li>
+  <li>Dois clientes reais já bastam para segmentar produto e preço, desde que sejam de perfis diferentes.</li>
+  <li>Em operação frenética, cada toque a mais pesa tanto quanto a lentidão da rede.</li>
+  <li>Uma medição "depois" faz parte da entrega, e é um item que ainda me falta fechar aqui.</li>
+</ul>
+</main>
+
+<footer><div class="wrap">© 2026 Maria Cecília Paiva de Sousa. Nomes de clientes e leads foram omitidos por privacidade. <a href="./">Voltar ao início</a>.</div></footer>
+</body>
+</html>

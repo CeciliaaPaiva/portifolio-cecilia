@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UniPsi · Cecília Paiva</title>
+<meta name="description" content="Estudo de caso: marketplace de terapia social com preço pela renda, prontuário sigiloso e chatbot de triagem. Priorização, decisões de risco e ética de produto.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="./">Cecília Paiva</a>
+  <nav aria-label="Principal"><a href="./#casos">Casos</a><a href="./#contato">Contato</a></nav>
+</div></header>
+
+<main class="wrap">
+<a class="back" href="./">← Todos os casos</a>
+<section class="hero" style="padding-top:24px">
+  <p class="eyebrow">Estudo de caso</p>
+  <h1>UniPsi: terapia social a um preço que cabe no bolso</h1>
+  <p class="lead">Plataforma que conecta psicólogos comprometidos com terapia social a pacientes em vulnerabilidade socioeconômica. O psicólogo ganha agenda, prontuário e financeiro. O paciente encontra um profissional, vê o valor por extenso e agenda sem constrangimento. Quem está em crise recebe uma saída imediata na tela.</p>
+  <dl class="meta">
+    <div><dt>Meu papel</dt><dd>Product owner e desenvolvedora</dd></div>
+    <div><dt>Período</dt><dd>desde mai/2026</dd></div>
+    <div><dt>Estado</dt><dd>MVP funcional em homologação, sem usuários reais</dd></div>
+    <div><dt>Modelo</dt><dd>B2B2C: assinatura do psicólogo e marketplace</dd></div>
+    <div><dt>Stack</dt><dd>Java 21 e Spring Boot, React, PostgreSQL</dd></div>
+  </dl>
+</section>
+
+<h2>O problema</h2>
+<p>Do lado do psicólogo, agenda em papel ou planilha, prontuário em caderno, cobrança informal e faltas sem aviso que comprometem a renda. Do lado do paciente, terapia associada a algo caro, e jovens que já desabafam com chatbots genéricos, que não substituem o acompanhamento e podem errar justamente quando a pessoa está mais frágil.</p>
+<p>Defini o sucesso em três frases: um paciente elegível encontra um profissional e faz a primeira sessão sem atrito nem constrangimento; um psicólogo aprovado toca a prática inteira dentro da plataforma; <strong>ninguém em crise fica sem uma saída imediata na tela</strong>.</p>
+
+<h2>O que decidi priorizar</h2>
+<p>Com um escopo grande e prazo curto, escrevi uma hierarquia de valor para decidir cortes:</p>
+<div class="tablewrap"><table>
+  <thead><tr><th>Camada</th><th>O que é</th><th>Por que nessa ordem</th></tr></thead>
+  <tbody>
+    <tr><td>Núcleo</td><td>Marketplace de psicólogos disponíveis</td><td>Sem ele não há plataforma: o paciente precisa encontrar e agendar.</td></tr>
+    <tr><td>Inovação 1</td><td>Prontuário eletrônico cifrado, com codinome</td><td>Diferencial técnico e legal, mas o marketplace funciona sem ele.</td></tr>
+    <tr><td>Inovação 2</td><td>Chatbot de triagem com detecção de crise</td><td>Diferencial de impacto social, e o paciente pode agendar sem ele.</td></tr>
+  </tbody>
+</table></div>
+<p><strong>Regra de desempate:</strong> em conflito de escopo ou atraso, preservar o marketplace. Entreguei nessa ordem, em sprints de 0 a 6, com um arquivo de release por entrega.</p>
+
+<h2>Preço como regra de produto</h2>
+<p>O valor da sessão é calculado a partir da faixa de renda declarada, da modalidade e do tipo de atendimento. A pessoa vê o valor por extenso <em>antes</em> de confirmar e nunca vê o rótulo "baixa renda": a faixa aparece como um cálculo, com a explicação ao lado.</p>
+<ul>
+  <li>Quatro faixas de renda per capita, de até ¼ do salário mínimo até 2 salários mínimos, com valor de sessão avulsa de R$ 60 a R$ 75.</li>
+  <li>Pacote mensal de 4 sessões com 5% de desconto. Terapia de casal custa o dobro.</li>
+  <li>Taxa da plataforma de 20% sobre cada sessão. O psicólogo recebe o líquido, mostrado no resumo financeiro.</li>
+  <li>A faixa é declarada uma vez no cadastro. Depois, só o psicólogo pode pedir revisão do perfil financeiro, para o paciente não ajustar o próprio preço.</li>
+</ul>
+<p class="note">A tabela de valores está marcada como em revisão no projeto: ainda preciso validá-la com psicólogos antes de tratá-la como definitiva.</p>
+
+<h2>Decisões em que mudei de ideia com evidência</h2>
+<h3>Depois da primeira demo com o stakeholder</h3>
+<p>A reunião de 07/07 gerou uma lista de ajustes que registrei em ata e entreguei em seguida: busca por área de atuação em vez de "especialidade", economia do pacote exibida ao paciente, terapia de casal, anamnese básica, foto e idade do paciente, e CVV e SAMU na saída de crise.</p>
+<h3>Um requisito que nunca poderia acontecer</h3>
+<p>A regra original liberava a anamnese ao psicólogo quando houvesse uma cobrança paga ligada a uma sessão ainda agendada. Ao modelar o financeiro, percebi que a cobrança só nasce quando a sessão é realizada, então a combinação jamais ocorreria. Levei o conflito ao stakeholder e a regra passou a ser: o psicólogo lê a anamnese <strong>enquanto existir uma sessão agendada entre os dois</strong>, e o acesso se encerra quando a sessão é realizada. Cada leitura fica registrada em auditoria.</p>
+<h3>Contato obrigatório no chatbot</h3>
+<p>O campo de contato era opcional. Em crise, o psicólogo acionado não teria como retornar, então passou a ser obrigatório, com o motivo explicado na tela. É uma fricção que escolhi de propósito, porque protege a pessoa.</p>
+<h3>O chat só abre depois do agendamento</h3>
+<p>No começo o chat interno só liberava depois de uma cobrança paga, ou seja, depois da primeira sessão. Mas o psicólogo precisa dar boas-vindas e pedir a ficha antes. Mudei a regra para "existe sessão não cancelada" e acrescentei um aviso fixo contra trocar contatos externos, que contraria as diretrizes da plataforma.</p>
+
+<h2>Risco: o chatbot não vai para produção sem a LGPD</h2>
+<p>O chatbot é a funcionalidade mais sensível do produto. Decidi em 06/10/2026 que <strong>ele não entra em produção até cumprir todas as exigências da LGPD</strong>. Há uma chave que o desliga e, desligado, a tela mostra só CVV (188) e SAMU (192). Nas versões de teste ele continua ligado.</p>
+<p>Regras de produto do chatbot: nunca emite diagnóstico; primeiro acolhe, sem citar psicólogo; em crise, aplica uma técnica de suporte (respiração, ancoragem, água gelada) e só depois fala em acionar um profissional; e só oferece "ver horários" quando a conversa chega ao encaminhamento. Um teste automatizado garante que cada técnica do roteiro continue sendo reconhecida como suporte de crise.</p>
+
+<h2>Ética de produto: o que escolhi não fazer</h2>
+<p>Na disciplina de IHC revisei o produto com um baralho de vieses de design e escrevi um checklist de padrões éticos para toda tela nova (nada pré-marcado a favor da plataforma, total a pagar sempre visível, sem urgência falsa, selos só com dado real). O mais útil foi a lista do que <strong>não apliquei, com justificativa</strong>:</p>
+<ul>
+  <li><strong>Efeito chamariz:</strong> criaria de propósito uma opção pior para empurrar outra. Com público vulnerável seria manipular uma decisão financeira.</li>
+  <li><strong>Efeito manada ("todo mundo faz"):</strong> pressionar decisão de saúde mental pelo que os outros fazem vai contra o princípio de que confiança vale mais que receita de curto prazo.</li>
+  <li><strong>Efeito placebo e registro de humor:</strong> criar expectativa de melhora sem conteúdo clínico enganaria quem está em sofrimento, e coletar humor fora de um protocolo clínico geraria dado sensível sem cuidado associado.</li>
+  <li><strong>Medir conclusão de agendamento com analytics de terceiros:</strong> envolve dado sensível de saúde mental, e eu não tenho ainda a base legal.</li>
+</ul>
+<div class="callout"><p>Selos, notas e números só entram com dado real. O projeto não tem usuários nem métricas de uso, e por isso este caso não traz nenhum número de impacto.</p></div>
+
+<h2>Hipóteses e o que já sei sobre elas</h2>
+<div class="tablewrap"><table>
+  <thead><tr><th>Hipótese</th><th>Como testaria</th><th>Situação</th></tr></thead>
+  <tbody>
+    <tr><td>Um chatbot que acolhe pode ser a ponte entre o desabafo com uma IA e a primeira sessão com um psicólogo.</td><td>Acompanhar quantas conversas chegam ao encaminhamento e à primeira sessão, com base legal para isso.</td><td><strong>Aberta.</strong> O chatbot está fora de produção até a LGPD.</td></tr>
+    <tr><td>Preço pela renda, apresentado como cálculo e sem rótulo, reduz o constrangimento de agendar.</td><td>Entrevistas com pacientes e acompanhamento do abandono na tela de confirmação.</td><td><strong>Aberta.</strong> Sem pacientes reais ainda.</td></tr>
+    <tr><td>O psicólogo de terapia social só consegue manter essa prática se tiver agenda, prontuário e financeiro no mesmo lugar.</td><td>Alinhamentos com o stakeholder psicólogo, registrados em ata, e uso por psicólogos reais.</td><td><strong>Parcial.</strong> Veio do stakeholder e moldou o escopo, mas não foi testada com uso.</td></tr>
+  </tbody>
+</table></div>
+
+<h2>Métricas que eu acompanharia</h2>
+<p>O projeto não tem produção nem usuários, então <strong>não há resultados para mostrar</strong>. Estas são as métricas que defini para o lançamento:</p>
+<ul>
+  <li><strong>Principal:</strong> pacientes elegíveis que chegam à primeira sessão realizada, sem desistir no caminho.</li>
+  <li><strong>Do lado do psicólogo:</strong> taxa de faltas sem aviso (o problema que originou o produto) e tempo gasto em tarefas administrativas.</li>
+  <li><strong>De segurança:</strong> em crise, tempo até o contato de retorno ou até a saída com CVV e SAMU.</li>
+</ul>
+<p class="note">Medir esses dados exige base legal, porque são dados de saúde mental. Por isso decidi não ligar um analytics de terceiros antes de resolver a LGPD.</p>
+
+<h2>Documentação e entrega</h2>
+<ul>
+  <li>Documento de Visão, 35 requisitos funcionais, 8 não funcionais e 11 casos de uso, 27 histórias de usuário em 10 épicos com critérios de aceitação, plano de sprints e de testes.</li>
+  <li>Atas das reuniões com o stakeholder, com resumo pronto para o grupo de mensagens.</li>
+  <li>Registro vivo de débitos técnicos: cada release declara o que ficou para depois.</li>
+  <li>Design system documentado, com contraste e alvo de toque mínimos de acessibilidade (WCAG), foco visível e nenhum estado dependendo só de cor.</li>
+  <li>Sigilo por construção: prontuário cifrado, paciente identificado por codinome e acesso auditado, inclusive para o administrador.</li>
+</ul>
+
+<h2>O que aprendi</h2>
+<ul>
+  <li>Hierarquia de valor escrita faz o corte de escopo deixar de ser uma discussão.</li>
+  <li>Um requisito vindo do stakeholder pode ser impossível de acontecer no modelo. Só se descobre modelando.</li>
+  <li>Em produto de saúde, "não fazer" (nudge, métrica, urgência) é parte do desenho, e precisa ficar escrito.</li>
+  <li>O que falta: validar preço e fluxo com psicólogos e pacientes reais antes de qualquer lançamento.</li>
+</ul>
+</main>
+
+<footer><div class="wrap">© 2026 Maria Cecília Paiva de Sousa. <a href="./">Voltar ao início</a>.</div></footer>
+</body>
+</html>
